@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Finder & Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neon: "#22d3ee",
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 font-sans">
+
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-8 border-b border-slate-800 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 shadow-lg shadow-cyan-500/20 ring-1 ring-white/10">
+          <span class="text-xl font-black tracking-tighter text-neon">
+            <img src="/images/ChatGPT Image Dec 4, 2025, 05_52_11 PM.png" alt="Logo" />
+          </span>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-slate-100">MMBD</h1>
+        
+        </div>
+      </div>
+    </header>
+
+    <!-- SEARCH VIEW -->
+    <div id="search-view" class="space-y-8 transition-opacity duration-300">
+      
+      <!-- Search Input -->
+      <div class="relative group">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search for movies (e.g., 'Batman', 'Star Wars')..." 
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-lg focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition shadow-lg placeholder-slate-600"
+            autofocus
+        >
+        <button 
+            onclick="searchMovies()"
+            class="absolute right-3 top-3 bottom-3 bg-slate-800 text-neon px-6 rounded-lg font-bold hover:bg-slate-700 transition border border-slate-700 hover:border-neon"
+        >
+            Search
+        </button>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+         
+         <div class="col-span-full text-center py-12 text-slate-500 bg-slate-900/50 rounded-xl border border-dashed border-slate-800">
+            <p>Start by typing a movie name above.</p>
+         </div>
+      </div>
+    </div>
+
+    
+    <div id="details-view" class="hidden transition-opacity duration-300">
+      
+      <button onclick="showSearch()" class="mb-6 text-cyan-400 hover:text-white flex items-center gap-2 transition group">
+        <span class="group-hover:-translate-x-1 transition-transform">&larr;</span> Back to Results
+      </button>
+
+      <div id="details-content" class="bg-slate-900 p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-800 ring-1 ring-white/5">
+         
+      </div>
+    </div>
+
+  </div>
+
+<script>
+const API_KEY = "253104d8"; 
+const searchView = document.getElementById("search-view");
+const detailsView = document.getElementById("details-view");
+const resultsContainer = document.getElementById("results");
+const detailsContent = document.getElementById("details-content");
+const input = document.getElementById("searchInput");
+
+
+input.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') searchMovies();
+});
+
+
+async function searchMovies() {
+    const query = input.value.trim();
+    if(!query) return;
+
+    resultsContainer.innerHTML = `<div class="col-span-full text-center text-neon animate-pulse py-12">Searching ...</div>`;
+
+    try {
+        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`);
+        const data = await res.json();
+
+        if (data.Response === "True") {
+            resultsContainer.innerHTML = data.Search.map(movie => `
+                <div onclick="loadDetails('${movie.imdbID}')" class="cursor-pointer group bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-neon transition hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-500/20">
+                    <div class="aspect-[2/3] overflow-hidden bg-slate-800 relative">
+                        ${movie.Poster !== "N/A" 
+                            ? `<img src="${movie.Poster}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${movie.Title}">`
+                            : `<div class="flex items-center justify-center h-full text-slate-600 text-xs">No Poster Available</div>`
+                        }
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
+                    </div>
+                    <div class="p-3 relative">
+                        <h3 class="font-bold text-sm truncate text-slate-200 group-hover:text-neon transition">${movie.Title}</h3>
+                        <p class="text-xs text-slate-500 mt-1">${movie.Year}</p>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            resultsContainer.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <p class="text-red-400 font-bold mb-1">new imagenary movie name unlocked(no movie found)</p>
+                    <p class="text-slate-500 text-sm">${data.Error}</p>
+                    <error class="text-slate-400 text-xs mt-2">Try searching for different titles or check your spelling.</error>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error(err);
+        resultsContainer.innerHTML = `<div class="col-span-full text-center text-red-400 py-12">Network Error</div>`;
+    }
+}
+
+
+async function loadDetails(id) {
+   
+    searchView.classList.add("hidden");
+    detailsView.classList.remove("hidden");
+    
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    detailsContent.innerHTML = `
+        <div class="flex items-center justify-center h-64 animate-pulse text-slate-400 gap-3">
+            <span class="h-3 w-3 bg-neon rounded-full animate-bounce"></span>
+            <span class="h-3 w-3 bg-neon rounded-full animate-bounce delay-75"></span>
+            <span class="h-3 w-3 bg-neon rounded-full animate-bounce delay-150"></span>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${id}&plot=full`);
+        const movie = await res.json();
+
+        if (movie.Response === "False") {
+            detailsContent.innerHTML = `<div class="text-red-400 text-center p-10">Failed to load details.</div>`;
+            return;
+        }
+
+        detailsContent.innerHTML = `
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Poster Column -->
+                <div class="md:w-1/3 shrink-0">
+                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://placehold.co/300x450?text=No+Poster'}" 
+                         class="rounded-lg w-full shadow-2xl shadow-black/50 object-cover ring-1 ring-white/10" 
+                         alt="${movie.Title}">
+                    
+                    <div class="mt-4 grid grid-cols-2 gap-2 text-center">
+                        <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
+                            <div class="text-xs text-slate-500 uppercase">Metascore</div>
+                            <div class="font-bold text-neon">${movie.Metascore}</div>
+                        </div>
+                        <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
+                            <div class="text-xs text-slate-500 uppercase">Votes</div>
+                            <div class="font-bold text-slate-200">${movie.imdbVotes}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div class="md:w-2/3 space-y-5">
+                    <div>
+                        <h2 class="text-4xl font-black text-white leading-none mb-2">${movie.Title}</h2>
+                        <div class="flex flex-wrap gap-2 text-xs font-semibold tracking-wide text-slate-400">
+                            <span class="border border-slate-700 px-2 py-0.5 rounded text-neon">${movie.Rated}</span>
+                            <span>${movie.Year}</span>
+                            <span>•</span>
+                            <span>${movie.Runtime}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                         ${movie.Genre.split(',').map(g => 
+                            `<span class="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 hover:border-neon transition cursor-default">${g.trim()}</span>`
+                         ).join('')}
+                    </div>
+
+                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+                         <p class="text-slate-300 italic leading-relaxed">"${movie.Plot}"</p>
+                    </div>
+
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Director</span> <span class="text-white">${movie.Director}</span></p>
+                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Writer</span> <span>${movie.Writer}</span></p>
+                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Actors</span> <span class="text-neon">${movie.Actors}</span></p>
+                        <p class="flex pt-1"><span class="w-24 text-slate-500 font-semibold">Awards</span> <span>${movie.Awards}</span></p>
+                    </div>
+
+                    <div class="pt-4 flex items-center gap-3">
+                        <div class="flex items-center gap-1 text-yellow-400">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <span class="text-2xl font-bold text-white">${movie.imdbRating}</span>
+                        </div>
+                        <span class="text-slate-600 text-sm">IMDb Rating</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error(error);
+        detailsContent.innerHTML = `<div class="text-red-400 text-center">Connection failed.</div>`;
+    }
+}
+
+function showSearch() {
+    detailsView.classList.add("hidden");
+    searchView.classList.remove("hidden");
+    
+    if (!input.value) {
+        input.focus();
+    }
+}
+
+
+</script>
+</body>
+</html>
