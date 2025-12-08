@@ -5,18 +5,7 @@
   <title>MMBD - Movie Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            neon: "#22d3ee",
-            accent: "#f97316",
-          }
-        }
-      }
-    }
-  </script>
+
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 overflow-x-hidden selection:bg-neon selection:text-slate-900">
  
@@ -31,8 +20,8 @@
     <header class="flex items-center justify-between py-6">
       <div class="flex items-center gap-3">
         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 shadow-lg shadow-cyan-500/20 ring-1 ring-white/10">
-          <span class="text-xl font-black tracking-tighter ImageLogo ">
-            <img src="images/ChatGPT Image Dec 4, 2025, 05_52_11 PM.png" alt="Logo" />
+          <span class="text-xl ">
+            <img src="images/ChatGPT Image Dec 4, 2025, 05_52_11 PM.png"  />
           </span>
         </div>
         <div>
@@ -49,15 +38,7 @@
       
       <section class="w-full max-w-xl space-y-8 flex flex-col z-10">
         
-        <div>
-            <p class="inline-flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-900/80 px-3 py-1 text-xs font-medium text-slate-300 shadow-sm shadow-cyan-500/10 backdrop-blur-sm">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            Live movie search active
-            </p>
-        </div>
+     
 
         
         <div class="space-y-4">
@@ -75,7 +56,7 @@
 
         
         <div class="space-y-4">
-          <label for="search-redirect" class="text-xs font-bold uppercase tracking-widest text-slate-500">
+          <label class="text-xs font-bold uppercase tracking-widest text-slate-500">
             Start Exploring
           </label>
 
@@ -99,19 +80,15 @@
              </a>
           </div>
           
-          <p class="text-xs text-slate-500 pl-1">
-            Trending: 
-            <button onclick="window.location.href='https://www.primevideo.com/region/eu/detail/Interstellar/0PUNMGZEWOMYFKR1XIGOLTL2YM'" class="hover:text-neon hover:underline cursor-pointer transition">Interstellar</button>, 
-            <button onclick="window.location.href='https://in.bookmyshow.com/movies/hyderabad/akhanda-2-thaandavam/ET00416621'" class="hover:text-neon hover:underline cursor-pointer transition">akhanda-2-thaandavam</button>
-          </p>
+          
         </div>
 
         
         <div class="mt-4 grid grid-cols-3 gap-3">
           <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 backdrop-blur-sm">
-            <p class="text-[0.65rem] uppercase tracking-wider text-slate-500 font-bold mb-1">Source</p>
-            <p class="text-lg font-bold text-slate-200">OMDb</p>
-            <p class="text-[0.7rem] text-slate-400">Verified Data</p>
+            <p class="text-[0.65rem] uppercase tracking-wider text-slate-500 font-bold mb-1">SEARCH</p>
+            <p class="text-lg font-bold text-slate-200">MOVIESb</p>
+            <p class="text-[0.7rem] text-slate-400">YESSSSSSSS</p>
           </div>
           <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 backdrop-blur-sm">
             <p class="text-[0.65rem] uppercase tracking-wider text-slate-500 font-bold mb-1">Speed</p>
@@ -121,7 +98,7 @@
           <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 backdrop-blur-sm">
             <p class="text-[0.65rem] uppercase tracking-wider text-slate-500 font-bold mb-1">Detail</p>
             <p class="text-lg font-bold text-slate-200">basic</p>
-            <p class="text-[0.7rem] text-slate-400">Plot, Cast, Rating</p>
+            <p class="text-[0.7rem] text-slate-400">DETAILS</p>
           </div>
         </div>
       </section>
@@ -154,6 +131,7 @@
   </div>
 </body>
 </html>
+
 
 
 
