@@ -6,17 +6,7 @@
   <title>Movie Finder & Details</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            neon: "#22d3ee",
-          }
-        }
-      }
-    }
-  </script>
+
 </head>
 
 <body class="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 font-sans">
@@ -82,7 +72,6 @@
   </div>
 
 <script>
-const API_KEY = "253104d8"; 
 const searchView = document.getElementById("search-view");
 const detailsView = document.getElementById("details-view");
 const resultsContainer = document.getElementById("results");
@@ -90,156 +79,84 @@ const detailsContent = document.getElementById("details-content");
 const input = document.getElementById("searchInput");
 
 
-input.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') searchMovies();
-});
+const movies = [
+ {id:"1",title:"Inception",year:"2010",rating:"8.8",genre:["Action","Sci-Fi"],director:"Christopher Nolan",actors:"Leonardo DiCaprio",plot:"A thief who steals corporate secrets through dream-sharing technology.",poster:"https://m.media-amazon.com/images/I/51s+zCk5DUL.jpg"},
+ {id:"2",title:"Interstellar",year:"2014",rating:"8.6",genre:["Drama","Sci-Fi"],director:"Christopher Nolan",actors:"Matthew McConaughey",plot:"A team travels through a wormhole in space.",poster:"https://m.media-amazon.com/images/I/71n58rD8pxL._AC_SY679_.jpg"},
+ {id:"3",title:"The Dark Knight",year:"2008",rating:"9.0",genre:["Action","Crime"],director:"Christopher Nolan",actors:"Christian Bale",plot:"Batman faces the Joker.",poster:"https://m.media-amazon.com/images/I/51k0qa6B2pL.jpg"},
+ {id:"4",title:"Avengers: Endgame",year:"2019",rating:"8.4",genre:["Action","Fantasy"],director:"Russo Brothers",actors:"Robert Downey Jr.",plot:"The Avengers assemble once more.",poster:"https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_SY679_.jpg"},
+ {id:"5",title:"Titanic",year:"1997",rating:"7.9",genre:["Romance","Drama"],director:"James Cameron",actors:"Leonardo DiCaprio",plot:"A romance aboard a doomed ship.",poster:"https://m.media-amazon.com/images/I/51rGG+K6pDL.jpg"},
+ {id:"6",title:"Joker",year:"2019",rating:"8.4",genre:["Crime","Drama"],director:"Todd Phillips",actors:"Joaquin Phoenix",plot:"The origin story of the Joker.",poster:"https://m.media-amazon.com/images/I/71KkEt6jMJL._AC_SY679_.jpg"},
+ {id:"7",title:"Gladiator",year:"2000",rating:"8.5",genre:["Action","Drama"],director:"Ridley Scott",actors:"Russell Crowe",plot:"A betrayed Roman general seeks revenge.",poster:"https://m.media-amazon.com/images/I/51A9WqRMKXL.jpg"},
+ {id:"8",title:"Bahubali",year:"2015",rating:"8.1",genre:["Action","Fantasy"],director:"S. S. Rajamouli",actors:"Prabhas",plot:"A man discovers his royal heritage.",poster:"https://m.media-amazon.com/images/I/71pKJ+uxcWL._AC_SY679_.jpg"},
+ {id:"9",title:"RRR",year:"2022",rating:"8.0",genre:["Action","Drama"],director:"S. S. Rajamouli",actors:"NTR, Ram Charan",plot:"Two revolutionaries fight colonial power.",poster:"https://m.media-amazon.com/images/I/91ZNxyl3V3L._AC_SY679_.jpg"},
+ {id:"10",title:"Dangal",year:"2016",rating:"8.3",genre:["Sport","Drama"],director:"Nitesh Tiwari",actors:"Aamir Khan",plot:"A father trains his daughters for wrestling.",poster:"https://m.media-amazon.com/images/I/81tbtZ6mATL._AC_SY679_.jpg"},
+ {id:"11",title:"3 Idiots",year:"2009",rating:"8.4",genre:["Comedy","Drama"],director:"Rajkumar Hirani",actors:"Aamir Khan",plot:"Three friends navigate engineering life.",poster:"https://m.media-amazon.com/images/I/81Gz3Jz9FAL._AC_SY679_.jpg"},
+ {id:"12",title:"Spider-Man",year:"2002",rating:"7.4",genre:["Action","Fantasy"],director:"Sam Raimi",actors:"Tobey Maguire",plot:"A teen gains spider powers.",poster:"https://m.media-amazon.com/images/I/51v5ZpFyaFL.jpg"},
+ {id:"13",title:"Iron Man",year:"2008",rating:"7.9",genre:["Action","Sci-Fi"],director:"Jon Favreau",actors:"Robert Downey Jr.",plot:"A billionaire builds a suit of armor.",poster:"https://m.media-amazon.com/images/I/51E4yDubIbL.jpg"},
+ {id:"14",title:"Avatar",year:"2009",rating:"7.8",genre:["Adventure","Sci-Fi"],director:"James Cameron",actors:"Sam Worthington",plot:"A marine on an alien planet.",poster:"https://m.media-amazon.com/images/I/81O3-+pVWWL._AC_SY679_.jpg"},
+ {id:"15",title:"Frozen",year:"2013",rating:"7.4",genre:["Animation","Fantasy"],director:"Chris Buck",actors:"Kristen Bell",plot:"Two sisters trapped in eternal winter.",poster:"https://m.media-amazon.com/images/I/91WlQzzlGkL._AC_SY679_.jpg"},
+ {id:"16",title:"Up",year:"2009",rating:"8.2",genre:["Animation","Adventure"],director:"Pete Docter",actors:"Ed Asner",plot:"An old man flies his house with balloons.",poster:"https://m.media-amazon.com/images/I/81eVtD2mLLL._AC_SY679_.jpg"},
+ {id:"17",title:"Coco",year:"2017",rating:"8.4",genre:["Animation","Fantasy"],director:"Lee Unkrich",actors:"Anthony Gonzalez",plot:"A boy explores the Land of the Dead.",poster:"https://m.media-amazon.com/images/I/81xtsHY0kDL._AC_SY679_.jpg"},
+ {id:"18",title:"Toy Story",year:"1995",rating:"8.3",genre:["Animation","Comedy"],director:"John Lasseter",actors:"Tom Hanks",plot:"Toys come to life.",poster:"https://m.media-amazon.com/images/I/51NpxXxYbVL.jpg"},
+ {id:"19",title:"Jurassic Park",year:"1993",rating:"8.2",genre:["Adventure","Sci-Fi"],director:"Steven Spielberg",actors:"Sam Neill",plot:"Dinosaurs roam a theme park.",poster:"https://m.media-amazon.com/images/I/91OZHJbNwLL._AC_SY679_.jpg"},
+ {id:"20",title:"Transformers",year:"2007",rating:"7.0",genre:["Action","Sci-Fi"],director:"Michael Bay",actors:"Shia LaBeouf",plot:"Robots fight on Earth.",poster:"https://m.media-amazon.com/images/I/81aZIEBLiL._AC_SY679_.jpg"},
+ {id:"21",title:"John Wick",year:"2014",rating:"7.4",genre:["Action","Thriller"],director:"Chad Stahelski",actors:"Keanu Reeves",plot:"An assassin seeks revenge.",poster:"https://m.media-amazon.com/images/I/81YX-lLkJ6L._AC_SY679_.jpg"},
+ {id:"22",title:"Fast & Furious",year:"2001",rating:"6.8",genre:["Action","Crime"],director:"Rob Cohen",actors:"Vin Diesel",plot:"Street racing crime saga.",poster:"https://m.media-amazon.com/images/I/71g40mlbinL._AC_SY679_.jpg"},
+ {id:"23",title:"Matrix",year:"1999",rating:"8.7",genre:["Action","Sci-Fi"],director:"Wachowskis",actors:"Keanu Reeves",plot:"Reality is a simulation.",poster:"https://m.media-amazon.com/images/I/51EG732BV3L.jpg"},
+ {id:"24",title:"Godfather",year:"1972",rating:"9.2",genre:["Crime","Drama"],director:"Francis Ford Coppola",actors:"Marlon Brando",plot:"Italian mafia family saga.",poster:"https://m.media-amazon.com/images/I/91x7KX8wcOL._AC_SY679_.jpg"},
+ {id:"25",title:"Forrest Gump",year:"1994",rating:"8.8",genre:["Drama","Romance"],director:"Robert Zemeckis",actors:"Tom Hanks",plot:"Life story of an extraordinary man.",poster:"https://m.media-amazon.com/images/I/71NUZzNn7SL._AC_SY679_.jpg"}
+];
 
 
-async function searchMovies() {
-    const query = input.value.trim();
-    if(!query) return;
+function searchMovies(){
+ const query = input.value.toLowerCase();
+ const filtered = movies.filter(m => m.title.toLowerCase().includes(query));
 
-    resultsContainer.innerHTML = `<div class="col-span-full text-center text-neon animate-pulse py-12">Searching ...</div>`;
+ resultsContainer.innerHTML = "";
 
-    try {
-        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`);
-        const data = await res.json();
-
-        if (data.Response === "True") {
-            resultsContainer.innerHTML = data.Search.map(movie => `
-                <div onclick="loadDetails('${movie.imdbID}')" class="cursor-pointer group bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-neon transition hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-500/20">
-                    <div class="aspect-[2/3] overflow-hidden bg-slate-800 relative">
-                        ${movie.Poster !== "N/A" 
-                            ? `<img src="${movie.Poster}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${movie.Title}">`
-                            : `<div class="flex items-center justify-center h-full text-slate-600 text-xs">No Poster Available</div>`
-                        }
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
-                    </div>
-                    <div class="p-3 relative">
-                        <h3 class="font-bold text-sm truncate text-slate-200 group-hover:text-neon transition">${movie.Title}</h3>
-                        <p class="text-xs text-slate-500 mt-1">${movie.Year}</p>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            resultsContainer.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <p class="text-red-400 font-bold mb-1">new imagenary movie name unlocked(no movie found)</p>
-                    <p class="text-slate-500 text-sm">${data.Error}</p>
-                    <error class="text-slate-400 text-xs mt-2">Try searching for different titles or check your spelling.</error>
-                </div>
-            `;
-        }
-    } catch (err) {
-        console.error(err);
-        resultsContainer.innerHTML = `<div class="col-span-full text-center text-red-400 py-12">Network Error</div>`;
-    }
-}
-
-
-async function loadDetails(id) {
-   
-    searchView.classList.add("hidden");
-    detailsView.classList.remove("hidden");
+ filtered.forEach(movie => {
+   const card = document.createElement("div");
+   card.className = "cursor-pointer bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-neon transition";
+   card.innerHTML = `
+    <img src="${movie.poster}" class="w-full h-64 object-cover">
+    <div class="p-3">
+      <h3 class="font-bold">${movie.title}</h3>
+      <p class="text-xs text-slate-500">${movie.year}</p>
+    </div>`;
     
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    detailsContent.innerHTML = `
-        <div class="flex items-center justify-center h-64 animate-pulse text-slate-400 gap-3">
-            <span class="h-3 w-3 bg-neon rounded-full animate-bounce"></span>
-            <span class="h-3 w-3 bg-neon rounded-full animate-bounce delay-75"></span>
-            <span class="h-3 w-3 bg-neon rounded-full animate-bounce delay-150"></span>
-        </div>
-    `;
-
-    try {
-        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${id}&plot=full`);
-        const movie = await res.json();
-
-        if (movie.Response === "False") {
-            detailsContent.innerHTML = `<div class="text-red-400 text-center p-10">Failed to load details.</div>`;
-            return;
-        }
-
-        detailsContent.innerHTML = `
-            <div class="flex flex-col md:flex-row gap-8">
-                <!-- Poster Column -->
-                <div class="md:w-1/3 shrink-0">
-                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://placehold.co/300x450?text=No+Poster'}" 
-                         class="rounded-lg w-full shadow-2xl shadow-black/50 object-cover ring-1 ring-white/10" 
-                         alt="${movie.Title}">
-                    
-                    <div class="mt-4 grid grid-cols-2 gap-2 text-center">
-                        <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
-                            <div class="text-xs text-slate-500 uppercase">Metascore</div>
-                            <div class="font-bold text-neon">${movie.Metascore}</div>
-                        </div>
-                        <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
-                            <div class="text-xs text-slate-500 uppercase">Votes</div>
-                            <div class="font-bold text-slate-200">${movie.imdbVotes}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                
-                <div class="md:w-2/3 space-y-5">
-                    <div>
-                        <h2 class="text-4xl font-black text-white leading-none mb-2">${movie.Title}</h2>
-                        <div class="flex flex-wrap gap-2 text-xs font-semibold tracking-wide text-slate-400">
-                            <span class="border border-slate-700 px-2 py-0.5 rounded text-neon">${movie.Rated}</span>
-                            <span>${movie.Year}</span>
-                            <span>•</span>
-                            <span>${movie.Runtime}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-2">
-                         ${movie.Genre.split(',').map(g => 
-                            `<span class="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 hover:border-neon transition cursor-default">${g.trim()}</span>`
-                         ).join('')}
-                    </div>
-
-                    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
-                         <p class="text-slate-300 italic leading-relaxed">"${movie.Plot}"</p>
-                    </div>
-
-                    <div class="space-y-2 text-sm text-slate-300">
-                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Director</span> <span class="text-white">${movie.Director}</span></p>
-                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Writer</span> <span>${movie.Writer}</span></p>
-                        <p class="flex border-b border-slate-800 pb-2"><span class="w-24 text-slate-500 font-semibold">Actors</span> <span class="text-neon">${movie.Actors}</span></p>
-                        <p class="flex pt-1"><span class="w-24 text-slate-500 font-semibold">Awards</span> <span>${movie.Awards}</span></p>
-                    </div>
-
-                    <div class="pt-4 flex items-center gap-3">
-                        <div class="flex items-center gap-1 text-yellow-400">
-                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <span class="text-2xl font-bold text-white">${movie.imdbRating}</span>
-                        </div>
-                        <span class="text-slate-600 text-sm">IMDb Rating</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
-    } catch (error) {
-        console.error(error);
-        detailsContent.innerHTML = `<div class="text-red-400 text-center">Connection failed.</div>`;
-    }
-}
-
-function showSearch() {
-    detailsView.classList.add("hidden");
-    searchView.classList.remove("hidden");
-    
-    if (!input.value) {
-        input.focus();
-    }
+   card.addEventListener("click", () => loadDetails(movie.id));
+   resultsContainer.appendChild(card);
+ });
 }
 
 
+function loadDetails(id){
+ const movie = movies.find(m => m.id === id);
+
+ searchView.classList.add("hidden");
+ detailsView.classList.remove("hidden");
+
+ detailsContent.innerHTML = `
+  <div class="flex gap-6">
+   <img src="${movie.poster}" class="w-64 rounded">
+   <div>
+    <h2 class="text-3xl font-bold">${movie.title}</h2>
+    <p class="text-slate-400">${movie.year} • ${movie.genre.join(", ")}</p>
+    <p class="mt-3">${movie.plot}</p>
+    <p class="mt-2 text-neon">Rating: ⭐ ${movie.rating}</p>
+   </div>
+  </div>`;
+}
+
+
+function showSearch(){
+ detailsView.classList.add("hidden");
+ searchView.classList.remove("hidden");
+}
 </script>
+
 </body>
 </html>
+
 
 
