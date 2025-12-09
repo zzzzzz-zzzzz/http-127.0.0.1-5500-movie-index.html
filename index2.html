@@ -1,162 +1,698 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Movie Finder & Details</title>
+  <title>Movie Finder & Details - MMBD (Local Data)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
-
+ 
 </head>
 
 <body class="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 font-sans">
 
   <div class="max-w-4xl mx-auto">
     
-    
     <header class="flex items-center justify-between mb-8 border-b border-slate-800 pb-6">
       <div class="flex items-center gap-3">
         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 shadow-lg shadow-cyan-500/20 ring-1 ring-white/10">
           <span class="text-xl font-black tracking-tighter text-neon">
+            
             <img src="images/ChatGPT Image Dec 4, 2025, 05_52_11 PM.png" alt="Logo" />
           </span>
         </div>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-slate-100">MMBD</h1>
-        
         </div>
       </div>
     </header>
 
-   
+    
     <div id="search-view" class="space-y-8 transition-opacity duration-300">
       
-
       <div class="relative group">
-        <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="Search for movies (e.g., 'Batman', 'Star Wars')..." 
-            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-lg focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition shadow-lg placeholder-slate-600"
-            autofocus
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search for movies "
+          class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-lg focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition shadow-lg placeholder-slate-600"
+          autofocus
         >
-        <button 
-            onclick="searchMovies()"
-            class="absolute right-3 top-3 bottom-3 bg-slate-800 text-neon px-6 rounded-lg font-bold hover:bg-slate-700 transition border border-slate-700 hover:border-neon"
+        <button
+          id="searchButton"
+          class="absolute right-3 top-3 bottom-3 bg-slate-800 text-neon px-6 rounded-lg font-bold hover:bg-slate-700 transition border border-slate-700 hover:border-neon"
         >
-            Search
+          Search
         </button>
       </div>
 
-      
+     
       <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-         
-         <div class="col-span-full text-center py-12 text-slate-500 bg-slate-900/50 rounded-xl border border-dashed border-slate-800">
-            <p>Start by typing a movie name above.</p>
-         </div>
+        <div class="col-span-full text-center py-12 text-slate-500 bg-slate-900/50 rounded-xl border border-dashed border-slate-800">
+          <p>Start by typing a movie name above, or press Search to show all movies.</p>
+        </div>
       </div>
     </div>
 
-    
+    <!-- DETAILS VIEW -->
     <div id="details-view" class="hidden transition-opacity duration-300">
-      
-      <button onclick="showSearch()" class="mb-6 text-cyan-400 hover:text-white flex items-center gap-2 transition group">
+      <!-- Back Button -->
+      <button id="backButton" class="mb-6 text-cyan-400 hover:text-white flex items-center gap-2 transition group">
         <span class="group-hover:-translate-x-1 transition-transform">&larr;</span> Back to Results
       </button>
 
       <div id="details-content" class="bg-slate-900 p-6 sm:p-8 rounded-2xl shadow-2xl border border-slate-800 ring-1 ring-white/5">
-         
+        <!-- Details will be injected here -->
       </div>
     </div>
 
   </div>
 
-<script>
-const searchView = document.getElementById("search-view");
-const detailsView = document.getElementById("details-view");
-const resultsContainer = document.getElementById("results");
-const detailsContent = document.getElementById("details-content");
-const input = document.getElementById("searchInput");
+  <script>
+    const searchView = document.getElementById("search-view");
+    const detailsView = document.getElementById("details-view");
+    const resultsContainer = document.getElementById("results");
+    const detailsContent = document.getElementById("details-content");
+    const input = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const backButton = document.getElementById("backButton");
 
+  
+    const movies = [
+      {
+        id: "1",
+        title: "Inception",
+        year: "2010",
+        poster: "https://m.media-amazon.com/images/M/MV5BZjhkNjM0ZTMtNGM5MC00ZTQ3LTk3YmYtZTkzYzdiNWE0ZTA2XkEyXkFqcGc@._V1_.jpg",
+        rating: "PG-13",
+        runtime: "148 min",
+        genre: "Action, Sci-Fi",
+        director: "Christopher Nolan",
+        writer: "Christopher Nolan",
+        actors: "Leonardo DiCaprio, Joseph Gordon-Levitt",
+        awards: "Won 4 Oscars",
+        plot: "A thief who steals corporate secrets through dream-sharing technology.",
+        
+        imdbRating: "8.8",
+        imdbVotes: "2,000,000"
+      },
+      {
+        id: "2",
+        title: "Interstellar",
+        year: "2014",
+        poster: "https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg",
+        rating: "PG-13",
+        runtime: "169 min",
+        genre: "Adventure, Drama, Sci-Fi",
+        director: "Christopher Nolan",
+        writer: "Jonathan Nolan, Christopher Nolan",
+        actors: "Matthew McConaughey, Anne Hathaway",
+        awards: "Won 1 Oscar",
+        plot: "A team of explorers travel through a wormhole in space.",
+        
+        imdbRating: "8.6",
+        imdbVotes: "1,900,000"
+      },
+      {
+        id: "3",
+        title: "The Dark Knight",
+        year: "2008",
+        poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+        rating: "PG-13",
+        runtime: "152 min",
+        genre: "Action, Crime, Drama",
+        director: "Christopher Nolan",
+        writer: "Jonathan Nolan, Christopher Nolan",
+        actors: "Christian Bale, Heath Ledger",
+        awards: "Won 2 Oscars",
+        plot: "Batman sets out to dismantle the remaining criminal organizations.",
+        
+        imdbRating: "9.0",
+        imdbVotes: "2,700,000"
+      },
+      {
+        id: "4",
+        title: "Avengers: Endgame",
+        year: "2019",
+        poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+        rating: "PG-13",
+        runtime: "181 min",
+        genre: "Action, Adventure, Drama",
+        director: "Anthony Russo, Joe Russo",
+        writer: "Christopher Markus, Stephen McFeely",
+        actors: "Robert Downey Jr., Chris Evans",
+        awards: "Nominated for 1 Oscar",
+        plot: "The Avengers assemble once more to undo Thanos's actions.",
+        
+        imdbRating: "8.4",
+        imdbVotes: "1,300,000"
+      },
+      {
+        id: "5",
+        title: "Titanic",
+        year: "1997",
+        poster: "https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+        rating: "PG-13",
+        runtime: "194 min",
+        genre: "Drama, Romance",
+        director: "James Cameron",
+        writer: "James Cameron",
+        actors: "Leonardo DiCaprio, Kate Winslet",
+        awards: "Won 11 Oscars",
+        plot: "A love story blossoms aboard the ill-fated RMS Titanic.",
+       
+        imdbRating: "7.9",
+        imdbVotes: "1,200,000"
+      },
+      {
+        id: "6",
+        title: "Joker",
+        year: "2019",
+        poster: "https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg",
+        rating: "R",
+        runtime: "122 min",
+        genre: "Crime, Drama, Thriller",
+        director: "Todd Phillips",
+        writer: "Todd Phillips, Scott Silver",
+        actors: "Joaquin Phoenix",
+        awards: "Won 2 Oscars",
+        plot: "A mentally troubled comedian embarks on a downward spiral.",
+        
+        imdbRating: "8.4",
+        imdbVotes: "1,400,000"
+      },
+      {
+        id: "7",
+        title: "Gladiator",
+        year: "2000",
+        poster: "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg",
+        rating: "R",
+        runtime: "155 min",
+        genre: "Action, Adventure, Drama",
+        director: "Ridley Scott",
+        writer: "David Franzoni, John Logan",
+        actors: "Russell Crowe",
+        awards: "Won 5 Oscars",
+        plot: "A Roman general seeks revenge after being betrayed.",
+        
+        imdbRating: "8.5",
+        imdbVotes: "1,500,000"
+      },
+      {
+        id: "8",
+        title: "Baahubali: The Beginning",
+        year: "2015",
+        poster: "https://image.tmdb.org/t/p/w500/9BAjt8nSSms62uOVYn1t3C3dVto.jpg",
+        rating: "U/A",
+        runtime: "159 min",
+        genre: "Action, Drama, Fantasy",
+        director: "S. S. Rajamouli",
+        writer: "Vijayendra Prasad",
+        actors: "Prabhas, Rana Daggubati",
+        awards: "National Film Awards winner",
+        plot: "A young man learns about his royal heritage.",
+        
+        imdbRating: "8.0",
+        imdbVotes: "150,000"
+      },
+      {
+        id: "9",
+        title: "RRR",
+        year: "2022",
+        poster: "https://upload.wikimedia.org/wikipedia/en/d/d7/RRR_Poster.jpg",
+        rating: "U/A",
+        runtime: "182 min",
+        genre: "Action, Drama",
+        director: "S. S. Rajamouli",
+        writer: "Vijayendra Prasad",
+        actors: "N. T. Rama Rao Jr., Ram Charan",
+        awards: "Oscar for Best Original Song",
+        plot: "Two revolutionaries fight against British rule.",
+        
+        imdbRating: "8.0",
+        imdbVotes: "250,000"
+      },
+      {
+        id: "10",
+        title: "Dangal",
+        year: "2016",
+        poster: "https://m.media-amazon.com/images/M/MV5BMTQ4MzQzMzM2Nl5BMl5BanBnXkFtZTgwMTQ1NzU3MDI@._V1_FMjpg_UX1000_.jpg",
+        rating: "U",
+        runtime: "161 min",
+        genre: "Biography, Drama, Sport",
+        director: "Nitesh Tiwari",
+        writer: "Piyush Gupta, Nitesh Tiwari",
+        actors: "Aamir Khan",
+        awards: "National Film Awards winner",
+        plot: "A father trains his daughters in wrestling.",
+       
+        imdbRating: "8.3",
+        imdbVotes: "200,000"
+      },
+      {
+        id: "11",
+        title: "3 Idiots",
+        year: "2009",
+        poster: "https://play-lh.googleusercontent.com/2plinRZ5j5LJ9fLBKbY8LRSmUjcHoJHQGnJtviRlhO9WF7T9eYfzMbPoGKydzKcnVZCI4Z8LXzxUV4Q10pQ",
+        rating: "U",
+        runtime: "170 min",
+        genre: "Comedy, Drama",
+        director: "Rajkumar Hirani",
+        writer: "Abhijat Joshi, Rajkumar Hirani",
+        actors: "Aamir Khan, R. Madhavan, Sharman Joshi",
+        awards: "Filmfare Awards winner",
+        plot: "Three friends navigate life at an engineering college.",
+       
+        imdbRating: "8.4",
+        imdbVotes: "450,000"
+      },
+      {
+        id: "12",
+        title: "Spider-Man",
+        year: "2002",
+        poster: "https://image.tmdb.org/t/p/w500/gh4cZbhZxyTbgxQPxD0dOudNPTn.jpg",
+        rating: "PG-13",
+        runtime: "121 min",
+        genre: "Action, Adventure, Sci-Fi",
+        director: "Sam Raimi",
+        writer: "David Koepp",
+        actors: "Tobey Maguire, Kirsten Dunst",
+        awards: "Nominated for 2 Oscars",
+        plot: "A teen gains superpowers after being bitten by a spider.",
+        
+        imdbRating: "7.4",
+        imdbVotes: "800,000"
+      },
+      {
+        id: "13",
+        title: "Iron Man",
+        year: "2008",
+        poster: "https://image.tmdb.org/t/p/w500/78lPtwv72eTNqFW9COBYI0dWDJa.jpg",
+        rating: "PG-13",
+        runtime: "126 min",
+        genre: "Action, Adventure, Sci-Fi",
+        director: "Jon Favreau",
+        writer: "Mark Fergus, Hawk Ostby",
+        actors: "Robert Downey Jr.",
+        awards: "Nominated for 2 Oscars",
+        plot: "A billionaire builds a suit of armor to fight evil.",
+        
+        imdbRating: "7.9",
+        imdbVotes: "1,100,000"
+      },
+      {
+        id: "14",
+        title: "Avatar",
+        year: "2009",
+        poster: "https://image.tmdb.org/t/p/w500/kyeqWdyUXW608qlYkRqosgbbJyK.jpg",
+        rating: "PG-13",
+        runtime: "162 min",
+        genre: "Action, Adventure, Fantasy",
+        director: "James Cameron",
+        writer: "James Cameron",
+        actors: "Sam Worthington, Zoe Saldana",
+        awards: "Won 3 Oscars",
+        plot: "A marine on an alien planet is torn between duty and conscience.",
+        
+        imdbRating: "7.8",
+        imdbVotes: "1,300,000"
+      },
+      {
+        id: "15",
+        title: "Frozen",
+        year: "2013",
+        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0Cstm6OmgohpjAXqQfpPepVhWD1kxeHzuUg&s",
+        rating: "PG",
+        runtime: "102 min",
+        genre: "Animation, Adventure, Comedy",
+        director: "Chris Buck, Jennifer Lee",
+        writer: "Jennifer Lee",
+        actors: "Kristen Bell, Idina Menzel",
+        awards: "Won 2 Oscars",
+        plot: "A fearless princess sets off to find her estranged sister.",
+       
+        imdbRating: "7.4",
+        imdbVotes: "600,000"
+      },
+      {
+        id: "16",
+        title: "Up",
+        year: "2009",
+        poster: "https://image.tmdb.org/t/p/w500/eKi8dIrr8voobbaGzDpe8w0PVbC.jpg",
+        rating: "PG",
+        runtime: "96 min",
+        genre: "Animation, Adventure, Comedy",
+        director: "Pete Docter",
+        writer: "Pete Docter, Bob Peterson",
+        actors: "Ed Asner",
+        awards: "Won 2 Oscars",
+        plot: "An old man flies his house with balloons to South America.",
+        
+        imdbRating: "8.2",
+        imdbVotes: "1,000,000"
+      },
+      {
+        id: "17",
+        title: "Coco",
+        year: "2017",
+        poster: "https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg ",
+        rating: "PG",
+        runtime: "105 min",
+        genre: "Animation, Adventure, Family",
+        director: "Lee Unkrich",
+        writer: "Adrian Molina, Matthew Aldrich",
+        actors: "Anthony Gonzalez",
+        awards: "Won 2 Oscars",
+        plot: "A boy explores the Land of the Dead to uncover his family's history.",
+        
+        imdbRating: "8.4",
+        imdbVotes: "600,000"
+      },
+      {
+        id: "18",
+        title: "Toy Story",
+        year: "1995",
+        poster: "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+        rating: "G",
+        runtime: "81 min",
+        genre: "Animation, Adventure, Comedy",
+        director: "John Lasseter",
+        writer: "Joss Whedon, Andrew Stanton",
+        actors: "Tom Hanks, Tim Allen",
+        awards: "Nominated for 3 Oscars",
+        plot: "Toys secretly come to life when humans are not around.",
+        
+        imdbRating: "8.3",
+        imdbVotes: "900,000"
+      },
+      {
+        id: "19",
+        title: "Jurassic Park",
+        year: "1993",
+        poster: "https://m.media-amazon.com/images/M/MV5BMjM2MDgxMDg0Nl5BMl5BanBnXkFtZTgwNTM2OTM5NDE@._V1_.jpg",
+        rating: "PG-13",
+        runtime: "127 min",
+        genre: "Action, Adventure, Sci-Fi",
+        director: "Steven Spielberg",
+        writer: "Michael Crichton, David Koepp",
+        actors: "Sam Neill, Laura Dern, Jeff Goldblum",
+        awards: "Won 3 Oscars",
+        plot: "Dinosaurs are brought back to life in a theme park.",
+        
+        imdbRating: "8.2",
+        imdbVotes: "1,000,000"
+      },
+      {
+        id: "20",
+        title: "Transformers",
+        year: "2007",
+        poster: "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/Transformers07.jpg/250px-Transformers07.jpg",
+        rating: "PG-13",
+        runtime: "144 min",
+        genre: "Action, Adventure, Sci-Fi",
+        director: "Michael Bay",
+        writer: "Roberto Orci, Alex Kurtzman",
+        actors: "Shia LaBeouf, Megan Fox",
+        awards: "Nominated for 3 Oscars",
+        plot: "Giant robots from another planet wage war on Earth.",
+        
+        imdbRating: "7.0",
+        imdbVotes: "650,000"
+      },
+      {
+        id: "21",
+        title: "John Wick",
+        year: "2014",
+        poster: "https://image.tmdb.org/t/p/w500/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg",
+        rating: "R",
+        runtime: "101 min",
+        genre: "Action, Crime, Thriller",
+        director: "Chad Stahelski",
+        writer: "Derek Kolstad",
+        actors: "Keanu Reeves",
+        awards: "Nominated for several awards",
+        plot: "An ex-hitman comes out of retirement for revenge.",
+        
+        imdbRating: "7.4",
+        imdbVotes: "650,000"
+      },
+      {
+        id: "22",
+        title: "The Fast and the Furious",
+        year: "2001",
+        poster: "https://m.media-amazon.com/images/M/MV5BZjg2NWI5MDEtYTkzMy00MmY1LThjMjUtZjQ3N2MwYWJhODkwXkEyXkFqcGdeQXZ3ZXNsZXk@._V1_.jpg",
+        rating: "PG-13",
+        runtime: "106 min",
+        genre: "Action, Crime, Thriller",
+        director: "Rob Cohen",
+        writer: "Gary Scott Thompson",
+        actors: "Vin Diesel, Paul Walker",
+        awards: "Won several MTV Awards",
+        plot: "An undercover cop infiltrates the world of street racing.",
+       
+        imdbRating: "6.8",
+        imdbVotes: "400,000"
+      },
+      {
+        id: "23",
+        title: "The Matrix",
+        year: "1999",
+        poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+        rating: "R",
+        runtime: "136 min",
+        genre: "Action, Sci-Fi",
+        director: "Lana Wachowski, Lilly Wachowski",
+        writer: "Lana Wachowski, Lilly Wachowski",
+        actors: "Keanu Reeves, Laurence Fishburne",
+        awards: "Won 4 Oscars",
+        plot: "A hacker discovers the reality he lives in is a simulation.",
+       
+        imdbRating: "8.7",
+        imdbVotes: "2,000,000"
+      },
+      {
+        id: "24",
+        title: "The Godfather",
+        year: "1972",
+        poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+        rating: "R",
+        runtime: "175 min",
+        genre: "Crime, Drama",
+        director: "Francis Ford Coppola",
+        writer: "Mario Puzo, Francis Ford Coppola",
+        actors: "Marlon Brando, Al Pacino",
+        awards: "Won 3 Oscars",
+        plot: "The aging patriarch of an organized crime dynasty transfers control to his son.",
+        
+        imdbRating: "9.2",
+        imdbVotes: "1,900,000"
+      },
+      {
+        id: "25",
+        title: "Forrest Gump",
+        year: "1994",
+        poster: "https://image.tmdb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg",
+        rating: "PG-13",
+        runtime: "142 min",
+        genre: "Drama, Romance",
+        director: "Robert Zemeckis",
+        writer: "Eric Roth",
+        actors: "Tom Hanks",
+        awards: "Won 6 Oscars",
+        plot: "The life story of a simple man with a big heart.",
+        
+        imdbRating: "8.8",
+        imdbVotes: "2,000,000"
+      }
+    ];
 
-const movies = [
- {id:"1",title:"Inception",year:"2010",rating:"8.8",genre:["Action","Sci-Fi"],director:"Christopher Nolan",actors:"Leonardo DiCaprio",plot:"A thief who steals corporate secrets through dream-sharing technology.",poster:"https://m.media-amazon.com/images/I/51s+zCk5DUL.jpg"},
- {id:"2",title:"Interstellar",year:"2014",rating:"8.6",genre:["Drama","Sci-Fi"],director:"Christopher Nolan",actors:"Matthew McConaughey",plot:"A team travels through a wormhole in space.",poster:"https://m.media-amazon.com/images/I/71n58rD8pxL._AC_SY679_.jpg"},
- {id:"3",title:"The Dark Knight",year:"2008",rating:"9.0",genre:["Action","Crime"],director:"Christopher Nolan",actors:"Christian Bale",plot:"Batman faces the Joker.",poster:"https://m.media-amazon.com/images/I/51k0qa6B2pL.jpg"},
- {id:"4",title:"Avengers: Endgame",year:"2019",rating:"8.4",genre:["Action","Fantasy"],director:"Russo Brothers",actors:"Robert Downey Jr.",plot:"The Avengers assemble once more.",poster:"https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_SY679_.jpg"},
- {id:"5",title:"Titanic",year:"1997",rating:"7.9",genre:["Romance","Drama"],director:"James Cameron",actors:"Leonardo DiCaprio",plot:"A romance aboard a doomed ship.",poster:"https://m.media-amazon.com/images/I/51rGG+K6pDL.jpg"},
- {id:"6",title:"Joker",year:"2019",rating:"8.4",genre:["Crime","Drama"],director:"Todd Phillips",actors:"Joaquin Phoenix",plot:"The origin story of the Joker.",poster:"https://m.media-amazon.com/images/I/71KkEt6jMJL._AC_SY679_.jpg"},
- {id:"7",title:"Gladiator",year:"2000",rating:"8.5",genre:["Action","Drama"],director:"Ridley Scott",actors:"Russell Crowe",plot:"A betrayed Roman general seeks revenge.",poster:"https://m.media-amazon.com/images/I/51A9WqRMKXL.jpg"},
- {id:"8",title:"Bahubali",year:"2015",rating:"8.1",genre:["Action","Fantasy"],director:"S. S. Rajamouli",actors:"Prabhas",plot:"A man discovers his royal heritage.",poster:"https://m.media-amazon.com/images/I/71pKJ+uxcWL._AC_SY679_.jpg"},
- {id:"9",title:"RRR",year:"2022",rating:"8.0",genre:["Action","Drama"],director:"S. S. Rajamouli",actors:"NTR, Ram Charan",plot:"Two revolutionaries fight colonial power.",poster:"https://m.media-amazon.com/images/I/91ZNxyl3V3L._AC_SY679_.jpg"},
- {id:"10",title:"Dangal",year:"2016",rating:"8.3",genre:["Sport","Drama"],director:"Nitesh Tiwari",actors:"Aamir Khan",plot:"A father trains his daughters for wrestling.",poster:"https://m.media-amazon.com/images/I/81tbtZ6mATL._AC_SY679_.jpg"},
- {id:"11",title:"3 Idiots",year:"2009",rating:"8.4",genre:["Comedy","Drama"],director:"Rajkumar Hirani",actors:"Aamir Khan",plot:"Three friends navigate engineering life.",poster:"https://m.media-amazon.com/images/I/81Gz3Jz9FAL._AC_SY679_.jpg"},
- {id:"12",title:"Spider-Man",year:"2002",rating:"7.4",genre:["Action","Fantasy"],director:"Sam Raimi",actors:"Tobey Maguire",plot:"A teen gains spider powers.",poster:"https://m.media-amazon.com/images/I/51v5ZpFyaFL.jpg"},
- {id:"13",title:"Iron Man",year:"2008",rating:"7.9",genre:["Action","Sci-Fi"],director:"Jon Favreau",actors:"Robert Downey Jr.",plot:"A billionaire builds a suit of armor.",poster:"https://m.media-amazon.com/images/I/51E4yDubIbL.jpg"},
- {id:"14",title:"Avatar",year:"2009",rating:"7.8",genre:["Adventure","Sci-Fi"],director:"James Cameron",actors:"Sam Worthington",plot:"A marine on an alien planet.",poster:"https://m.media-amazon.com/images/I/81O3-+pVWWL._AC_SY679_.jpg"},
- {id:"15",title:"Frozen",year:"2013",rating:"7.4",genre:["Animation","Fantasy"],director:"Chris Buck",actors:"Kristen Bell",plot:"Two sisters trapped in eternal winter.",poster:"https://m.media-amazon.com/images/I/91WlQzzlGkL._AC_SY679_.jpg"},
- {id:"16",title:"Up",year:"2009",rating:"8.2",genre:["Animation","Adventure"],director:"Pete Docter",actors:"Ed Asner",plot:"An old man flies his house with balloons.",poster:"https://m.media-amazon.com/images/I/81eVtD2mLLL._AC_SY679_.jpg"},
- {id:"17",title:"Coco",year:"2017",rating:"8.4",genre:["Animation","Fantasy"],director:"Lee Unkrich",actors:"Anthony Gonzalez",plot:"A boy explores the Land of the Dead.",poster:"https://m.media-amazon.com/images/I/81xtsHY0kDL._AC_SY679_.jpg"},
- {id:"18",title:"Toy Story",year:"1995",rating:"8.3",genre:["Animation","Comedy"],director:"John Lasseter",actors:"Tom Hanks",plot:"Toys come to life.",poster:"https://m.media-amazon.com/images/I/51NpxXxYbVL.jpg"},
- {id:"19",title:"Jurassic Park",year:"1993",rating:"8.2",genre:["Adventure","Sci-Fi"],director:"Steven Spielberg",actors:"Sam Neill",plot:"Dinosaurs roam a theme park.",poster:"https://m.media-amazon.com/images/I/91OZHJbNwLL._AC_SY679_.jpg"},
- {id:"20",title:"Transformers",year:"2007",rating:"7.0",genre:["Action","Sci-Fi"],director:"Michael Bay",actors:"Shia LaBeouf",plot:"Robots fight on Earth.",poster:"https://m.media-amazon.com/images/I/81aZIEBLiL._AC_SY679_.jpg"},
- {id:"21",title:"John Wick",year:"2014",rating:"7.4",genre:["Action","Thriller"],director:"Chad Stahelski",actors:"Keanu Reeves",plot:"An assassin seeks revenge.",poster:"https://m.media-amazon.com/images/I/81YX-lLkJ6L._AC_SY679_.jpg"},
- {id:"22",title:"Fast & Furious",year:"2001",rating:"6.8",genre:["Action","Crime"],director:"Rob Cohen",actors:"Vin Diesel",plot:"Street racing crime saga.",poster:"https://m.media-amazon.com/images/I/71g40mlbinL._AC_SY679_.jpg"},
- {id:"23",title:"Matrix",year:"1999",rating:"8.7",genre:["Action","Sci-Fi"],director:"Wachowskis",actors:"Keanu Reeves",plot:"Reality is a simulation.",poster:"https://m.media-amazon.com/images/I/51EG732BV3L.jpg"},
- {id:"24",title:"Godfather",year:"1972",rating:"9.2",genre:["Crime","Drama"],director:"Francis Ford Coppola",actors:"Marlon Brando",plot:"Italian mafia family saga.",poster:"https://m.media-amazon.com/images/I/91x7KX8wcOL._AC_SY679_.jpg"},
- {id:"25",title:"Forrest Gump",year:"1994",rating:"8.8",genre:["Drama","Romance"],director:"Robert Zemeckis",actors:"Tom Hanks",plot:"Life story of an extraordinary man.",poster:"https://m.media-amazon.com/images/I/71NUZzNn7SL._AC_SY679_.jpg"}
-];
-
-
-function searchMovies(){
- const query = input.value.toLowerCase();
- const filtered = movies.filter(m => m.title.toLowerCase().includes(query));
-
- resultsContainer.innerHTML = "";
-
- filtered.forEach(movie => {
-   const card = document.createElement("div");
-   card.className = "cursor-pointer bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-neon transition";
-   card.innerHTML = `
-    <img src="${movie.poster}" class="w-full h-64 object-cover">
-    <div class="p-3">
-      <h3 class="font-bold">${movie.title}</h3>
-      <p class="text-xs text-slate-500">${movie.year}</p>
-    </div>`;
     
-   card.addEventListener("click", () => loadDetails(movie.id));
-   resultsContainer.appendChild(card);
- });
-}
+    function renderResults(list) {
+      resultsContainer.innerHTML = "";
 
+      if (list.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <p class="text-red-400 font-bold mb-1">
+              no movie found
+            </p>
+            <p class="text-slate-500 text-sm">No movies match your search.</p>
+            <p class="text-slate-400 text-xs mt-2">
+              Try searching for a different title or clear the search box.
+            </p>
+          </div>
+        `;
+        return;
+      }
 
-function loadDetails(id){
- const movie = movies.find(m => m.id === id);
+      list.forEach((movie) => {
+        const card = document.createElement("div");
 
- searchView.classList.add("hidden");
- detailsView.classList.remove("hidden");
+        
+        card.className =
+          "cursor-pointer group bg-slate-900 rounded-xl overflow-hidden border border-slate-800 transition";
 
- detailsContent.innerHTML = `
-  <div class="flex gap-6">
-   <img src="${movie.poster}" class="w-64 rounded">
-   <div>
-    <h2 class="text-3xl font-bold">${movie.title}</h2>
-    <p class="text-slate-400">${movie.year} • ${movie.genre.join(", ")}</p>
-    <p class="mt-3">${movie.plot}</p>
-    <p class="mt-2 text-neon">Rating: ⭐ ${movie.rating}</p>
-   </div>
-  </div>`;
-}
+       
+        card.classList.add("hover:border-neon");
 
+    
 
-function showSearch(){
- detailsView.classList.add("hidden");
- searchView.classList.remove("hidden");
-}
-</script>
+        card.innerHTML = `
+         
+          <div class="p-3 relative">
+            <h3 class="font-bold text-sm truncate text-slate-200 group-hover:text-neon transition">
+              ${movie.title}
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">${movie.year}</p>
+          </div>
+        `;
 
+        card.addEventListener("click", () => {
+          loadDetails(movie.id);
+        });
+
+        resultsContainer.appendChild(card);
+      });
+    }
+
+   
+    function searchMovies() {
+      const query = input.value.trim().toLowerCase();
+
+      
+      const filtered = movies.filter((m) =>
+        m.title.toLowerCase().includes(query)
+      );
+
+      renderResults(filtered);
+    }
+
+    
+    function loadDetails(id) {
+      
+      const movie = movies.find((m) => m.id === id);
+      if (!movie) return;
+
+      
+      searchView.classList.add("hidden");
+      detailsView.classList.remove("hidden");
+
+      detailsContent.innerHTML = `
+        <div class="flex flex-col md:flex-row gap-8">
+          
+          <div class="md:w-1/3 shrink-0">
+            <img src="${posterUrl}"
+                 class="rounded-lg w-full shadow-2xl shadow-black/50 object-cover ring-1 ring-white/10"
+                 alt="${movie.title}">
+            
+            <div class="mt-4 grid grid-cols-2 gap-2 text-center">
+              <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
+                <div class="text-xs text-slate-500 uppercase">Runtime</div>
+                <div class="font-bold text-neon">${movie.runtime}</div>
+              </div>
+              <div class="bg-slate-800/50 rounded p-2 border border-slate-700">
+                <div class="text-xs text-slate-500 uppercase">Rating</div>
+                <div class="font-bold text-slate-200">${movie.imdbRating}</div>
+              </div>
+            </div>
+          </div>
+          
+          
+          <div class="md:w-2/3 space-y-5">
+            <div>
+              <h2 class="text-4xl font-black text-white leading-none mb-2">
+                ${movie.title}
+              </h2>
+              <div class="flex flex-wrap gap-2 text-xs font-semibold tracking-wide text-slate-400">
+                <span class="border border-slate-700 px-2 py-0.5 rounded text-neon">
+                  ${movie.rating}
+                </span>
+                <span>${movie.year}</span>
+                <span>•</span>
+                <span>${movie.runtime}</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+              ${
+                (movie.genre)
+                  .split(",")
+                  .map(
+                    (g) => `
+                <span class="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700 hover:border-neon transition cursor-default">
+                  ${g.trim()}
+                </span>`
+                  )
+                  .join("") || ""
+              }
+            </div>
+
+            <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+              <p class="text-slate-300 leading-relaxed">
+                "${movie.plot}"
+              </p>
+            </div>
+
+            <div class="space-y-2 text-sm text-slate-300">
+              <p class="flex border-b border-slate-800 pb-2">
+                <span class="w-24 text-slate-500 font-semibold">Director</span>
+                <span class="text-white">${movie.director}</span>
+              </p>
+              <p class="flex border-b border-slate-800 pb-2">
+                <span class="w-24 text-slate-500 font-semibold">Writer</span>
+                <span>${movie.writer}</span>
+              </p>
+              <p class="flex border-b border-slate-800 pb-2">
+                <span class="w-24 text-slate-500 font-semibold">Actors</span>
+                <span class="text-neon">${movie.actors}</span>
+              </p>
+              <p class="flex pt-1">
+                <span class="w-24 text-slate-500 font-semibold">Awards</span>
+                <span>${movie.awards}</span>
+              </p>
+            </div>
+
+            <div class="pt-4 flex items-center gap-3">
+              <div class="flex items-center gap-1 text-yellow-400">
+                
+                <span class="text-2xl font-bold text-white">
+                  ${movie.imdbRating}
+                </span>
+              </div>
+              <span class="text-slate-600 text-sm">IMDb Rating</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Show search view again
+    function showSearch() {
+      detailsView.classList.add("hidden");
+      searchView.classList.remove("hidden");
+      if (!input.value) {
+        input.focus();
+      }
+    }
+
+    
+    searchButton.addEventListener("click", () => {
+      searchMovies();
+    });
+
+   
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        searchMovies();
+      }
+    });
+
+ 
+    backButton.addEventListener("click", () => {
+      showSearch();
+    });
+
+ 
+    renderResults(movies);
+  </script>
 </body>
 </html>
-
-
-
