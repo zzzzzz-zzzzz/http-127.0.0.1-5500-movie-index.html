@@ -576,6 +576,13 @@
       searchView.classList.add("hidden");
       detailsView.classList.remove("hidden");
 
+      const posterUrl =
+        movie.poster && movie.poster !== "N/A"
+          ? movie.poster
+          : "https://placehold.co/300x450?text=No+Poster";
+
+      
+
       detailsContent.innerHTML = `
         <div class="flex flex-col md:flex-row gap-8">
           
